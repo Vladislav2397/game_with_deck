@@ -3,7 +3,7 @@
 // Rang = Ранг карты
 // Black Jack = 21 очко
 
-use rand::{thread_rng, seq::SliceRandom};
+use rand::{seq::SliceRandom, thread_rng};
 
 #[derive(Copy, Clone, Debug)]
 pub enum Rank {
@@ -30,19 +30,34 @@ pub enum Suit {
     Spades,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
 }
 
+#[derive(Debug)]
+pub struct Deck {
+    cards: Vec<Card>,
+}
+
+impl Deck {
+    pub fn new() -> Deck {
+        let deck = create_desk();
+        let deck = shuffle(&deck);
+
+        return Deck { cards: deck };
+    }
+
+    pub fn give_cards(&mut self) -> Option<Card> {
+        return self.cards.pop();
+    }
+}
+
 impl Card {
     // Создает новую карту с указанными rank и suit
     fn new(rank: Rank, suit: Suit) -> Card {
-        Card {
-            rank,
-            suit,
-        }
+        Card { rank, suit }
     }
 
     // Выводит читаемый формат для карты
@@ -65,48 +80,55 @@ fn rank_emoji(rank: Rank) -> &'static str {
     return match rank {
         Rank::Ace => "A",
         Rank::Two => "2",
-            Rank::Three => "3",
-            Rank::Four => "4",
-            Rank::Five => "5",
-            Rank::Six => "6",
-            Rank::Seven => "7",
-            Rank::Eight => "8",
-            Rank::Nine => "9",
-            Rank::Ten => "10",
-            Rank::Jack => "J",
-            Rank::Queen => "Q",
-            Rank::King => "K"
-    }
+        Rank::Three => "3",
+        Rank::Four => "4",
+        Rank::Five => "5",
+        Rank::Six => "6",
+        Rank::Seven => "7",
+        Rank::Eight => "8",
+        Rank::Nine => "9",
+        Rank::Ten => "10",
+        Rank::Jack => "J",
+        Rank::Queen => "Q",
+        Rank::King => "K",
+    };
 }
 
 // [PURE] Создает новую колоду из 52 карт
 pub fn create_desk() -> Vec<Card> {
-        let suits = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
-        let ranks = [
-            Rank::Ace,
-            Rank::Two,
-            Rank::Three,
-            Rank::Four,
-            Rank::Five,
-            Rank::Six,
-            Rank::Seven,
-            Rank::Eight,
-            Rank::Nine,
-            Rank::Ten,
-            Rank::Jack,
-            Rank::Queen,
-            Rank::King
-        ];
-        let mut deck = Vec::new();
-    
-        for suit in suits.iter() {
-            for rank in ranks.iter() {
-                let card = Card::new(*rank, *suit);
-                deck.push(card);
-            }
+    let suits = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
+    let ranks = [
+        Rank::Ace,
+        Rank::Two,
+        Rank::Three,
+        Rank::Four,
+        Rank::Five,
+        Rank::Six,
+        Rank::Seven,
+        Rank::Eight,
+        Rank::Nine,
+        Rank::Ten,
+        Rank::Jack,
+        Rank::Queen,
+        Rank::King,
+    ];
+    let mut deck = Vec::new();
+
+    for suit in suits.iter() {
+        for rank in ranks.iter() {
+            let card = Card::new(*rank, *suit);
+            deck.push(card);
         }
-    
-        return deck;
+    }
+
+    return deck;
+}
+
+pub fn create_shuffle_desk() -> Deck {
+    let deck = create_desk();
+    let deck = shuffle(&deck);
+
+    return Deck::new();
 }
 
 // [PURE] Возвращает новую перетасованную колоду
@@ -114,6 +136,6 @@ pub fn shuffle<T: Clone>(vec: &[T]) -> Vec<T> {
     let mut newvec = vec.to_vec();
 
     newvec.shuffle(&mut thread_rng());
-    
+
     newvec
 }
